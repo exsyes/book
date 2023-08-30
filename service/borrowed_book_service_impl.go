@@ -48,32 +48,31 @@ func (service *BorrowedBookServiceImpl) Create(ctx context.Context, request web.
 	return helper.ToBorrowedBooksResponse(BorrowedBook)
 }
 
-func (service *BorrowedBookServiceImpl) Update(ctx context.Context, request web.BorrowedBookUpdateRequest) web.BorrowedBookResponse {
+func (service *BorrowedBookServiceImpl) Update(ctx context.Context, request web.BorrowedBookUpdateRequest) web.BorrowedBookViewResponse {
 	err := service.Validate.Struct(request)
 	helper.PanicIfError(err)
+
 	tx, err := service.Db.Begin()
 	helper.PanicIfError(err)
+
 	defer helper.CommitOrRollback(tx)
 
-	//mencari buku yang juga akan di update
 	book, err := service.BookRepository.FindById(ctx, tx, request.Id_book)
-	helper.PanicIfError(err)
-	//ubah quantitynya
-	book.Quantity = book.Quantity + request.Quantity_back
-	book = service.BookRepository.UpdateQty(ctx, tx, book)
-
-	//lalu cari data peminjaman dengan ID nya
-	BorrowedBook, err := service.BorrowedBookrepository.FindById(ctx, tx, request.Id_borrowed)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
 	}
-	//ubah quantity peminjamannya
+	book.Quantity = book.Quantity + request.Quantity_back
+	book = service.BookRepository.UpdateQty(ctx, tx, book)
+
+	BorrowedBook, err := service.BorrowedBookrepository.FindByIdView(ctx, tx, request.Id_borrowed)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
 	BorrowedBook.Quantity_borrowed = BorrowedBook.Quantity_borrowed - request.Quantity_back
-	//tambah quantity kembalinya
 	BorrowedBook.Quantity_back = BorrowedBook.Quantity_back + request.Quantity_back
-	//lalu update
 	BorrowedBook = service.BorrowedBookrepository.Update(ctx, tx, BorrowedBook)
-	return helper.ToBorrowedBooksResponse(BorrowedBook)
+
+	return helper.ToBorrowedBooksViewResponse(BorrowedBook)
 }
 
 func (service *BorrowedBookServiceImpl) Delete(ctx context.Context, borrowedId int) {
@@ -100,6 +99,20 @@ func (service *BorrowedBookServiceImpl) FindByIdView(ctx context.Context, borrow
 	}
 
 	return helper.ToBorrowedBooksViewResponse(BorrowedBook)
+
+}
+
+func (service *BorrowedBookServiceImpl) FindById(ctx context.Context, borrowedId int) web.BorrowedBookResponse {
+	tx, err := service.Db.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	BorrowedBook, err := service.BorrowedBookrepository.FindById(ctx, tx, borrowedId)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	return helper.ToBorrowedBooksResponse(BorrowedBook)
 
 }
 

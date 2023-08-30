@@ -1,3 +1,12 @@
+PUT http://localhost:9191/borrowed/4
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id_book" : 3,
+  "quantity_back" : 5
+}
+###
 ##
 GET http://localhost:9191/borrowed
 Accept: application/json
@@ -12,10 +21,7 @@ Accept: application/json
 PUT http://localhost:9191/book/4
 Content-Type: application/json
 
-{
-  "title" : "Tema 5",
-  "quantity" : 100
-}
+
 
 ###
 POST http://localhost:9191/borrowed

@@ -29,9 +29,9 @@ VALUE(?, ?, ?, 0, NOW())`
 	return BorrowedBook
 }
 
-func (repository *BorrowedBookRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, BorrowedBook domain.BorrowedBooks) domain.BorrowedBooks {
-	SQL := `UPDATE borrowed_books SET quantity_back = ? WHERE id_borrowed = ?`
-	_, err := tx.ExecContext(ctx, SQL, BorrowedBook.Quantity_back, BorrowedBook.Id_borrowed)
+func (repository *BorrowedBookRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, BorrowedBook domain.BorrowedBooksView) domain.BorrowedBooksView {
+	SQL := `UPDATE borrowed_books SET quantity_back = ?, quantity_borrowed = ? WHERE id_borrowed = ?`
+	_, err := tx.ExecContext(ctx, SQL, BorrowedBook.Quantity_back, BorrowedBook.Quantity_borrowed, BorrowedBook.Id_borrowed)
 	helper.PanicIfError(err)
 	return BorrowedBook
 }
@@ -43,14 +43,14 @@ func (repository *BorrowedBookRepositoryImpl) Delete(ctx context.Context, tx *sq
 }
 
 func (repository *BorrowedBookRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, BorrowedBookId int) (domain.BorrowedBooks, error) {
-	SQL := `SELECT borrowed_date, id_borrowed, id_book, id_borrower, quantity_borrowed, quantity_back FROM borrowed_books WHERE id_borrowed = ?`
+	SQL := `SELECT id_borrowed, id_book, id_borrower, quantity_borrowed, quantity_back, date_borrowed FROM borrowed_books WHERE id_borrowed = ?`
 	rows, err := tx.QueryContext(ctx, SQL, BorrowedBookId)
 	helper.PanicIfError(err)
 	rows.Close()
 
 	BorrowedBook := domain.BorrowedBooks{}
 	if rows.Next() {
-		err := rows.Scan(&BorrowedBook.Date_borrowed, &BorrowedBook.Id_borrowed, &BorrowedBook.Id_borrower, &BorrowedBook.Id_book, &BorrowedBook.Quantity_borrowed, &BorrowedBook.Quantity_back)
+		err := rows.Scan(&BorrowedBook.Id_borrowed, &BorrowedBook.Id_borrower, &BorrowedBook.Id_book, &BorrowedBook.Quantity_borrowed, &BorrowedBook.Quantity_back, &BorrowedBook.Date_borrowed)
 		helper.PanicIfError(err)
 		return BorrowedBook, nil
 	} else {

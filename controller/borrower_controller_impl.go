@@ -17,7 +17,7 @@ func NewBorrowerController(borrowerService service.BorrowerService) BorrowerCont
 	return &BorrowerControllerImpl{BorrowerService: borrowerService}
 }
 
-func (controller BorrowerControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (controller *BorrowerControllerImpl) Create(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	borrowerCreateRequest := web.BorrowerCreateRequest{}
 	helper.FromRequestToBody(request, &borrowerCreateRequest)
 
@@ -31,7 +31,7 @@ func (controller BorrowerControllerImpl) Create(writer http.ResponseWriter, requ
 	helper.WriteToResponse(writer, webResponse)
 }
 
-func (controller BorrowerControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (controller *BorrowerControllerImpl) Update(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	borrowerUpdateRequest := web.BorrowerUpdateRequest{}
 	helper.FromRequestToBody(request, &borrowerUpdateRequest)
 
@@ -50,7 +50,7 @@ func (controller BorrowerControllerImpl) Update(writer http.ResponseWriter, requ
 	helper.WriteToResponse(writer, webResponse)
 }
 
-func (controller BorrowerControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (controller *BorrowerControllerImpl) Delete(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
 	borrowerId := params.ByName("borrowerId")
 	id, err := strconv.Atoi(borrowerId)
@@ -65,7 +65,7 @@ func (controller BorrowerControllerImpl) Delete(writer http.ResponseWriter, requ
 	helper.WriteToResponse(writer, webResponse)
 }
 
-func (controller BorrowerControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (controller *BorrowerControllerImpl) FindById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	borrowerId := params.ByName("borrowerId")
 	id, err := strconv.Atoi(borrowerId)
 	helper.PanicIfError(err)
@@ -81,7 +81,7 @@ func (controller BorrowerControllerImpl) FindById(writer http.ResponseWriter, re
 	helper.WriteToResponse(writer, webResponse)
 }
 
-func (controller BorrowerControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+func (controller *BorrowerControllerImpl) FindAll(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 
 	borrowerResponse := controller.BorrowerService.FindAll(request.Context())
 	webResponse := web.WebResponse{
