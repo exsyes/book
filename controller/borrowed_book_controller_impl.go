@@ -39,8 +39,8 @@ func (controller *BorrowedBookControllerImpl) Update(writer http.ResponseWriter,
 	id, err := strconv.Atoi(idBorrowed)
 	helper.PanicIfError(err)
 	borrowedBookUpdateRequest.Id_borrowed = id
-	controller.service.Update(request.Context(), borrowedBookUpdateRequest)
-	borrowedBookResponse := controller.service.FindByIdView(request.Context(), id)
+	borrowedBookResponse := controller.service.Update(request.Context(), borrowedBookUpdateRequest)
+	//borrowedBookResponse := controller.service.FindByIdView(request.Context(), id)
 	webResponse := web.WebResponse{
 		Code:   http.StatusOK,
 		Status: "success",
